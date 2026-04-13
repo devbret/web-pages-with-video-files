@@ -8,7 +8,7 @@ This application analyzes each page’s HTML using BeautifulSoup to detect nativ
 
 ## Set Up Instructions
 
-Below are instructions for installing and running this application.
+Below are instructions for installing and running this application on a Linux machine.
 
 ### Programs Needed
 
@@ -28,8 +28,21 @@ Below are instructions for installing and running this application.
 
 5. Install the needed dependencies for the script by running: `pip install -r requirements.txt`
 
-6. Edit the `app.py` file on line 101, to include the website that you would like to visualize; also consider changing the maximum number of links to crawl on line 54
+6. Edit the `app.py` file on line 101, to include the website you would like to visualize
+   - Also consider editing the `app.py` file on line 101 to adjust the maximum number of links to crawl
 
-7. Run the script with the command `python3 app.py`
+7. Run the script with the following command: `python3 app.py`
 
-8. When finished, view the generated `.txt` file for the internal URLs of web pages containing a video file
+8. When finished, view the generated `links.txt` file containing internal URLs of web pages with embedded or hosted video media
+
+## Other Considerations
+
+This project repo is intended to demonstrate an ability to do the following:
+
+- Crawl a website starting from a given URL and recursively visit internal links up to a specified limit
+
+- Analyze each web page’s HTML to detect embedded or hosted video content
+
+- Collect and save all URLs containing video content into a text file for later use
+
+If you have any questions or would like to collaborate, please reach out either on GitHub or via [my website](https://bretbernhoft.com/).
