@@ -1,12 +1,14 @@
-# Discover Web Pages With Video Files
+# Web Pages With Video Files
 
-A lightweight recursive web crawler which starts from a given URL, traverses internal links up to a specified limit and identifies pages containing embedded video content.
+Targeted web scraper which discovers and lists all pages containing embedded or hosted videos on a specified website, saving results in a structured text file.
 
-## Overview
+## Application Overview
 
-This application analyzes each page’s HTML using BeautifulSoup to detect native `<video>` elements, direct video file sources and embedded video players such as YouTube iframes, including common variants. When a page containing video content is found, its URL is recorded and after the crawl completes, all matching pages are saved to a text file for later review or analysis.
+Leverages libraries like `requests`, `BeautifulSoup` and Python’s built-in modules to analyze web page structures. It checks for video content in multiple ways; such as direct `<video>` tags with supported extensions, `<source>` or generic tags pointing to video files and embedded players via `<iframe>` elements. The crawler respects the `max_links` limit to avoid excessive requests and includes error handling.
 
-## Set Up Instructions
+Once the application identifies pages with videos, the script compiles a list of these URLs and saves them to a text file. The modular design allows customization, while maintaining efficiency through crawling. Overall, the tool automates the tedious process of manually searching for pages with videos on a website.
+
+## Basic Setup Instructions
 
 Below are instructions for installing and running this application on a Linux machine.
 
@@ -22,27 +24,32 @@ Below are instructions for installing and running this application on a Linux ma
 
 2. Open a terminal
 
-3. Clone this repository using `git` by running the following command: `git clone git@github.com:devbret/web-pages-with-video-files.git`
+3. Clone this repository: `git clone git@github.com:devbret/web-pages-with-video-files.git`
 
-4. Navigate to the repo's directory by running: `cd web-pages-with-video-files`
+4. Navigate to the repo's directory: `cd web-pages-with-video-files`
 
-5. Install the needed dependencies for the script by running: `pip install -r requirements.txt`
+5. Create a virtual environment: `python3 -m venv venv`
 
-6. Edit the `app.py` file on line 101, to include the website you would like to visualize
-   - Also consider editing the `app.py` file on line 101 to adjust the maximum number of links to crawl
+6. Activate your virtual environment: `source venv/bin/activate`
 
-7. Run the script with the following command: `python3 app.py`
+7. Install the needed dependencies: `pip install -r requirements.txt`
 
-8. When finished, view the generated `links.txt` file containing internal URLs of web pages with embedded or hosted video media
+8. Edit the `app.py` file (line 101) to include the target URL and max number of links
+
+9. Run the script: `python3 app.py`
+
+10. Exit the virtual environment: `deactivate`
 
 ## Other Considerations
 
 This project repo is intended to demonstrate an ability to do the following:
 
-- Crawl a website starting from a given URL and recursively visit internal links up to a specified limit
+- Crawl websites to identify and list all pages containing embedded or hosted videos
 
-- Analyze each web page’s HTML to detect embedded or hosted video content
+- Follow internal links while enforcing a configurable limit to avoid overloading servers or getting blocked
 
-- Collect and save all URLs containing video content into a text file for later use
+- Detect videos across formats and platforms by parsing HTML tags
+
+- Generate a structured text file of all URLs containing videos
 
 If you have any questions or would like to collaborate, please reach out either on GitHub or via [my website](https://bretbernhoft.com/).
