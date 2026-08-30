@@ -1,4 +1,5 @@
 import requests
+from collections import deque
 from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 
@@ -8,11 +9,13 @@ VIDEO_EMBED_HOST_PATTERNS = (
     'youtube.com/embed/',
     'youtube-nocookie.com/embed/',
     'youtu.be/',
-    'player.vimeo.com/video/', 
+    'player.vimeo.com/video/',
 )
+
 
 def is_internal(url: str, base: str) -> bool:
     return urlparse(url).netloc == urlparse(base).netloc
+
 
 def _src_looks_like_video(src: str) -> bool:
     if not src:
@@ -20,19 +23,17 @@ def _src_looks_like_video(src: str) -> bool:
     src = src.strip().lower()
     return src.endswith(VIDEO_EXTENSIONS)
 
+
 def _src_looks_like_embed(src: str) -> bool:
     if not src:
         return False
     src = src.strip().lower()
     return any(pat in src for pat in VIDEO_EMBED_HOST_PATTERNS)
 
+
 def has_video(soup: BeautifulSoup) -> bool:
     if soup.find('video') is not None:
         return True
-
-    for tag in soup.find_all('source', src=True):
-        if _src_looks_like_video(tag.get('src')):
-            return True
 
     for tag in soup.find_all(src=True):
         if _src_looks_like_video(tag.get('src')):
@@ -51,9 +52,10 @@ def has_video(soup: BeautifulSoup) -> bool:
 
     return False
 
-def crawl_site(start_url: str, max_links: int = 40, timeout: int = 10, user_agent: str = None):
-    visited = set()
+
+def crawl_site(start_url: str, max_pages: int = 40, timeout: int = 10, user_agent: str = None):
     pages_with_videos = []
+    pages_crawled = 0
 
     headers = {}
     if user_agent:
@@ -61,43 +63,45 @@ def crawl_site(start_url: str, max_links: int = 40, timeout: int = 10, user_agen
     else:
         headers["User-Agent"] = "Mozilla/5.0 (compatible; VideoCrawler/1.0; +https://example.com/bot)"
 
-    def crawl(url: str):
-        if len(visited) >= max_links:
-            return
-        if url in visited:
-            return
+    seen = {start_url}
+    queue = deque([start_url])
 
-        visited.add(url)
+    while queue and pages_crawled < max_pages:
+        url = queue.popleft()
         print(f"Crawling: {url}")
 
         try:
             response = requests.get(url, headers=headers, timeout=timeout)
             response.raise_for_status()
-
-            soup = BeautifulSoup(response.text, 'html.parser')
-
-            if has_video(soup):
-                pages_with_videos.append(url)
-
-            for link in soup.find_all('a', href=True):
-                href = urljoin(url, link.get('href'))
-                href = href.split('#', 1)[0]
-
-                if is_internal(href, start_url) and href not in visited:
-                    crawl(href)
-
         except requests.exceptions.RequestException as e:
             print(f"Failed to crawl {url}: {e}")
+            continue
 
-    crawl(start_url)
+        pages_crawled += 1
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        if has_video(soup):
+            pages_with_videos.append(url)
+
+        for link in soup.find_all('a', href=True):
+            href = urljoin(url, link.get('href'))
+            href = href.split('#', 1)[0]
+
+            if is_internal(href, start_url) and href not in seen:
+                seen.add(href)
+                queue.append(href)
+
     return pages_with_videos
+
 
 def save_links_as_txt(links, filename: str = 'links.txt'):
     with open(filename, 'w', encoding='utf-8') as file:
         for link in links:
             file.write(link + '\n')
 
+
 if __name__ == "__main__":
-    pages_with_videos = crawl_site("'https://www.example.com/'", max_links=40)
+    pages_with_videos = crawl_site("https://www.example.com/", max_pages=40)
     save_links_as_txt(pages_with_videos, filename='links.txt')
     print(f"Found {len(pages_with_videos)} pages with videos. Saved to links.txt")
