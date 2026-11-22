@@ -34,7 +34,7 @@ Below are instructions for installing and running this application on a Linux ma
 
 7. Install the needed dependencies: `pip install -r requirements.txt`
 
-8. Edit the `app.py` file (line 101) to include the target URL and max number of links
+8. Edit the `app.py` file (line 6) to include the target URL and max number of links
 
 9. Run the script: `python3 app.py`
 
